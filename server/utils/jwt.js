@@ -10,3 +10,7 @@ export const createToken = (userId) => {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
+
+export const getUserId = (token) => {
+  return jwt.verify(token, process.env.JWT_SECRETE_KEY)
+}

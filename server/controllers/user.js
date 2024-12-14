@@ -37,14 +37,14 @@ export const Register = async (req, res) => {
   } catch (e) {
     //! check if the error validation fields
     if (e.name == "ValidationError") {
-      return res.status(400).send({
+      return res.send({
         message: "Validation failed",
         error: firstErrorMessage(e),
       });
     }
 
     //! this error isn't occurred from user
-    res.status(500).json({
+    res.json({
       message: "An error occurred during registration.",
       error: e.message,
     });
@@ -57,13 +57,13 @@ export const Login = async (req, res) => {
   //! user not found case
   const user = await User.findOne({ email });
   if (!user) {
-    return res.status(404).send({ error: "user not found!" });
+    return res.send({ error: "user not found!" });
   }
 
   //! password isn't valid case
   const isValidPassword = await checkPass(password, user.password);
   if (!isValidPassword) {
-    return res.status(401).send({error: "Password isn't correct!"})
+    return res.send({error: "Password isn't correct!"})
   }
 
   //! valid request
