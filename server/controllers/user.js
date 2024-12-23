@@ -6,6 +6,7 @@ import {
   hashPass,
 } from "../utils/index.js";
 import { checkPass } from "../utils/user.js";
+import { io } from "../index.js";
 
 //TODO>> register controller
 export const Register = async (req, res) => {
@@ -34,6 +35,8 @@ export const Register = async (req, res) => {
       user,
       token: createToken(user.id),
     });
+    io.emit("user_created", user);
+
   } catch (e) {
     //! check if the error validation fields
     if (e.name == "ValidationError") {
@@ -53,7 +56,7 @@ export const Register = async (req, res) => {
 
 export const Login = async (req, res) => {
   const { email, password } = req.body;
-  
+
   //! user not found case
   const user = await User.findOne({ email });
   if (!user) {
@@ -63,11 +66,27 @@ export const Login = async (req, res) => {
   //! password isn't valid case
   const isValidPassword = await checkPass(password, user.password);
   if (!isValidPassword) {
-    return res.send({error: "Password isn't correct!"})
+    return res.send({ error: "Password isn't correct!" });
   }
 
   //! valid request
   user.password = undefined;
   const token = createToken(user.id);
   res.status(200).send({ message: "successfully login", user, token });
+};
+
+export const getFriends = async (req, res) => {
+  try {
+    console.log(req.userId);
+    const users = await User.find({ _id: { $ne: req.userId } }).select(
+      "-password"
+    );
+    res.status(200).json({ success: "true", users });
+  } catch (e) {
+    console.error("Error fetching friends:", error.message);
+    res.json({
+      success: false,
+      message: "Unable to fetch friends. Please try again later.",
+    });
+  }
 };
