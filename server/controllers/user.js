@@ -90,3 +90,7 @@ export const getFriends = async (req, res) => {
     });
   }
 };
+
+export const updateUser = async (req, res) => {
+  const {name, email, status} = req.body;
+}
